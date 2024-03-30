@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
-const port = 3000
+// const port = 3000
 const mongoose = require('mongoose')
+
+require('dotenv').config()
 
 app.use(express.json())
 const swaggerUi = require('swagger-ui-express')
@@ -13,15 +15,25 @@ mongoose.connect(process.env.MONGODB_URI)
     err => { console.log('Failed to connect to mongdb', err)}
 )
 
+const cors = require('cors')
+app.use(cors({
+    origin: '*'         // to all
+    // origin: ['http://localhost:8000', 'http://www.aueb.gr']
+}))
+
 const user = require('./routes/user.route')
 const product = require('./routes/product.route')
 const userProducts = require('./routes/user-products.route')
 
+app.use('/', express.static('files'))
 app.use('/api/users', user)
 app.use('/api/products', product)
 app.use('/api/user-products', userProducts)
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument.options))
 
-app.listen(port, () => {
-    console.log('Server is up')
-})
+// app.listen(port, () => {
+//     console.log('Server is up')
+// })
+
+module.exports = app
